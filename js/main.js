@@ -4,6 +4,7 @@ import {
   getFirestore,
   collection,
   addDoc,
+  serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
 // Firebase設定を外部ファイルから読み込み
@@ -19,6 +20,7 @@ const messagesCol = collection(db, "messages");
 // ドキュメントを追加
 addDoc(messagesCol, {
   message: "Hello, Firestore!",
+  timestamp: serverTimestamp(),
 })
   .then((docRef) => {
     console.log(`✅ ドキュメントID: ${docRef.id} に追加しました`);
