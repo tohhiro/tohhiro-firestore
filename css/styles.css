@@ -15,6 +15,12 @@ h1 {
   font-weight: normal;
 }
 
+h1 > button {
+  float: right;
+  margin: 4px 4px;
+  padding: 6px 12px;
+}
+
 li {
   line-height: 2;
   list-style-position: inside;
@@ -24,4 +30,8 @@ input[type="text"] {
   padding: 6px 8px;
   font-size: 14px;
   width: 300px;
+}
+
+.hidden {
+  display: none;
 }
