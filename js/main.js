@@ -5,6 +5,9 @@ import {
   collection,
   addDoc,
   serverTimestamp,
+  onSnapshot,
+  query,
+  orderBy,
 } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
 // Firebase設定を外部ファイルから読み込み
@@ -19,6 +22,28 @@ const messagesCol = collection(db, "messages");
 
 const messageInput = document.getElementById("message");
 const form = document.querySelector("form");
+
+const messagesList = document.getElementById("messageList");
+// timestampでソートするクエリを作成
+const q = query(messagesCol, orderBy("timestamp", "asc"));
+onSnapshot(q, (snapshot) => {
+  messagesList.innerHTML = "";
+  
+  if (snapshot.empty) {
+    // データがない場合
+    const li = document.createElement("li");
+    li.textContent = "メッセージがありません";
+    li.style.color = "#999";
+    messagesList.appendChild(li);
+  } else {
+    // データがある場合
+    snapshot.forEach((doc) => {
+      const li = document.createElement("li");
+      li.textContent = doc.data().message;
+      messagesList.appendChild(li);
+    });
+  }
+});
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
