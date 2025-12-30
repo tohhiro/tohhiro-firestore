@@ -28,28 +28,24 @@ const messagesList = document.getElementById("messageList");
 const q = query(messagesCol, orderBy("timestamp", "asc"));
 onSnapshot(q, (snapshot) => {
   messagesList.innerHTML = "";
-  
-  if (snapshot.empty) {
-    // データがない場合
+  snapshot.forEach((doc) => {
     const li = document.createElement("li");
-    li.textContent = "メッセージがありません";
-    li.style.color = "#999";
+    li.textContent = doc.data().message;
     messagesList.appendChild(li);
-  } else {
-    // データがある場合
-    snapshot.forEach((doc) => {
-      const li = document.createElement("li");
-      li.textContent = doc.data().message;
-      messagesList.appendChild(li);
-    });
-  }
+  });
 });
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
+
+  const val = messageInput.value.trim();
+
+  // 空のメッセージは追加しない
+  if (!val) return;
+
   // ドキュメントを追加
   addDoc(messagesCol, {
-    message: messageInput.value,
+    message: val,
     timestamp: serverTimestamp(),
   })
     .then((docRef) => {
