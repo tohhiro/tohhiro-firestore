@@ -74,6 +74,7 @@ logoutButton.addEventListener("click", () => {
 onAuthStateChanged(auth, (user) => {
   if (user) {
     // ログイン中
+    me = user.uid;
     console.log("✅ ログイン中:", user.uid);
     loginButton.classList.add("hidden");
     [logoutButton, messagesList, form].forEach((el) =>
@@ -82,6 +83,7 @@ onAuthStateChanged(auth, (user) => {
     messageInput.focus();
   } else {
     // ログアウト中
+    me = null;
     [logoutButton, messagesList, form].forEach((el) =>
       el.classList.add("hidden")
     );
@@ -112,6 +114,9 @@ form.addEventListener("submit", async (e) => {
     })
     .catch((error) => {
       console.error("❌ エラー:", error);
+      if (error.code === "permission-denied") {
+        alert("ログインが必要です");
+      }
     });
 });
 
