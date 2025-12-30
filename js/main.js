@@ -12,6 +12,7 @@ import {
 import {
   getAuth,
   signInAnonymously,
+  signOut,
   onAuthStateChanged,
 } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 
@@ -22,6 +23,8 @@ import { firebaseConfig } from "./config.js";
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
+
+let me = null;
 
 // コレクションの参照を取得
 const messagesCol = collection(db, "messages");
@@ -40,21 +43,32 @@ onSnapshot(q, (snapshot) => {
   messagesList.innerHTML = "";
   snapshot.forEach((doc) => {
     const li = document.createElement("li");
-    li.textContent = doc.data().message;
+    const data = doc.data();
+    li.textContent = data.message + " (by: " + (data.uid || "anonymous") + ")";
     messagesList.appendChild(li);
   });
 });
 
 loginButton.addEventListener("click", () => {
-  signInAnonymously(auth).catch((error) => {
-    console.error("❌ サインインエラー:", error);
-  });
+  signInAnonymously(auth)
+    .then((result) => {
+      me = result.user.uid;
+      console.log("✅ ログインしました:", me);
+    })
+    .catch((error) => {
+      console.error("❌ サインインエラー:", error);
+    });
 });
 
 logoutButton.addEventListener("click", () => {
-  auth.signOut().catch((error) => {
-    console.error("❌ サインアウトエラー:", error);
-  });
+  signOut(auth)
+    .then(() => {
+      me = null;
+      console.log("✅ ログアウトしました");
+    })
+    .catch((error) => {
+      console.error("❌ サインアウトエラー:", error);
+    });
 });
 
 onAuthStateChanged(auth, (user) => {
@@ -89,6 +103,7 @@ form.addEventListener("submit", async (e) => {
   addDoc(messagesCol, {
     message: val,
     timestamp: serverTimestamp(),
+    uid: me ?? "anonymous",
   })
     .then((docRef) => {
       console.log(`✅ ドキュメントID: ${docRef.id} に追加しました`);
