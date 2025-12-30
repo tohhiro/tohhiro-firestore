@@ -17,14 +17,24 @@ const db = getFirestore(app);
 // コレクションの参照を取得
 const messagesCol = collection(db, "messages");
 
-// ドキュメントを追加
-addDoc(messagesCol, {
-  message: "Hello, Firestore!",
-  timestamp: serverTimestamp(),
-})
-  .then((docRef) => {
-    console.log(`✅ ドキュメントID: ${docRef.id} に追加しました`);
+const messageInput = document.getElementById("message");
+const form = document.querySelector("form");
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  // ドキュメントを追加
+  addDoc(messagesCol, {
+    message: messageInput.value,
+    timestamp: serverTimestamp(),
   })
-  .catch((error) => {
-    console.error("❌ エラー:", error);
-  });
+    .then((docRef) => {
+      console.log(`✅ ドキュメントID: ${docRef.id} に追加しました`);
+      messageInput.value = "";
+      messageInput.focus();
+    })
+    .catch((error) => {
+      console.error("❌ エラー:", error);
+    });
+});
+
+messageInput.focus();
